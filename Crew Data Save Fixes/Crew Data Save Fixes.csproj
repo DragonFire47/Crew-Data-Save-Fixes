@@ -64,7 +64,17 @@
     <Compile Include="Mod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SavesPatch.cs" />
-    <Compile Include="UpdateTalentsOnPlayerJoin.cs" />
+    <Compile Include="SurvivalBonusCounterCacheUpdatePatch.cs" />
+    <Compile Include="UpdateAvailableTalentsOnLevelUp.cs" />
+    <Compile Include="UpdateAvailableTalentsOnSpend.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>SET MOD_DIR="D:\Program Files (x86)\Steam\steamapps\common\PULSARLostColony\Mods\"
+
+IF EXIST %25MOD_DIR%25 (
+    ECHO Copying DLLs to Mods directory...
+    XCOPY /Y /F "$(TargetPath)" %25MOD_DIR%25
+)</PostBuildEvent>
+  </PropertyGroup>
 </Project>

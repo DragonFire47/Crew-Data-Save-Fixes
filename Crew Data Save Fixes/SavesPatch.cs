@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection.Emit;
@@ -9,47 +10,9 @@ namespace CrewDataSaveFixes
     [HarmonyPatch(typeof(PLSaveGameIO), "SaveToFile")]
     internal class SavesPatch
     {
-        public static void CachePlayerData(int classID) //Talents, Items
-        {
-            PLPlayer player = PLServer.Instance.GetCachedFriendlyPlayerOfClass(classID);
-            if (player != null && PLServer.Instance.LatestSaveGameData != null)
-            {
-                PLServer.Instance.LatestSaveGameData.ClassData[classID].Talents = player.Talents;
-
-                List<PawnItemDataBlock> pawnItemData = new List<PawnItemDataBlock>();
-                for (int i = 0; i < player.MyInventory.AllItems.Count; i++)
-                {
-                    PLPawnItem item = player.MyInventory.AllItems[i];
-                    pawnItemData.Add(new PawnItemDataBlock()
-                    {
-                        ItemType = item.PawnItemType,
-                        SubType = item.SubType,
-                        Level = item.Level,
-                        OptionalEquipID = item.EquipID
-                    });
-                }
-                PLServer.Instance.LatestSaveGameData.ClassData[classID].PawnInventory = pawnItemData;
-            }
-        }
-        public static void CacheSpareTalentPoints(int classID) //spent talents
-        {
-            if (PLServer.Instance.LatestSaveGameData == null)
-            {
-                return;
-            }
-            int spentTalents = 0;
-            int maxTalentCount = PLServer.Instance.LatestSaveGameData.ClassData[classID].Talents.Length;
-            for (int i = 0; i < maxTalentCount; i++)
-            {
-                spentTalents += PLServer.Instance.LatestSaveGameData.ClassData[classID].Talents[i];
-            }
-            PLServer.Instance.LatestSaveGameData.ClassData[classID].TalentPointsAvailable = ((PLServer.Instance.CurrentCrewLevel - 1) * 2) - spentTalents;
-        }
-
+        //Write Cached Player Data instead of writing nothing.
         static void PatchMethod(BinaryWriter binaryWriter, int currentClass)
 		{
-            CacheSpareTalentPoints(currentClass);
-
             binaryWriter.Write(true);
             binaryWriter.Write(PLServer.Instance.LatestSaveGameData.ClassData[currentClass].TalentPointsAvailable);
             binaryWriter.Write(PLServer.Instance.ClassInfos[currentClass].SurvivalBonusCounter);
@@ -78,7 +41,7 @@ namespace CrewDataSaveFixes
             List<CodeInstruction> targetSequence = new List<CodeInstruction>
             {
                 new CodeInstruction(OpCodes.Ldc_I4_0),
-                new CodeInstruction(OpCodes.Callvirt, AccessTools.Method(typeof(BinaryWriter), "Write")),
+                new CodeInstruction(OpCodes.Callvirt, AccessTools.Method(typeof(BinaryWriter), "Write", new Type[] { typeof(bool) })),
             };
 
             List<CodeInstruction> patchSequence = new List<CodeInstruction>
