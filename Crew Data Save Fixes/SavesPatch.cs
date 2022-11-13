@@ -13,6 +13,11 @@ namespace CrewDataSaveFixes
         //Write Cached Player Data instead of writing nothing.
         static void PatchMethod(BinaryWriter binaryWriter, int currentClass)
 		{
+            if(PLServer.Instance.LatestSaveGameData == null)
+            {
+                return;
+            }
+
             binaryWriter.Write(true);
             binaryWriter.Write(PLServer.Instance.LatestSaveGameData.ClassData[currentClass].TalentPointsAvailable);
             binaryWriter.Write(PLServer.Instance.ClassInfos[currentClass].SurvivalBonusCounter);
