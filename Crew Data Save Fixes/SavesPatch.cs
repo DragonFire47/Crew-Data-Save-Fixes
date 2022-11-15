@@ -15,6 +15,7 @@ namespace CrewDataSaveFixes
 		{
             if(PLServer.Instance.LatestSaveGameData == null)
             {
+                binaryWriter.Write(false);
                 return;
             }
 
