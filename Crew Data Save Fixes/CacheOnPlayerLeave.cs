@@ -8,14 +8,14 @@ namespace CrewDataSaveFixes
     {
         static void CachePlayerData(PLPlayer inPlayer) //Talents, Items
         {
-            if (inPlayer.TeamID != 0)//stop if not player team
+            if (inPlayer.TeamID != 0 || PLServer.Instance.LatestSaveGameData == null)//stop if not player team
             {
                 return;
             }
 
             int classID = inPlayer.GetClassID();
             PLPlayer player = PLServer.Instance.GetCachedFriendlyPlayerOfClass(classID);
-            if (player != null && PLServer.Instance.LatestSaveGameData != null && classID > -1 && classID < 5)
+            if (player != null && classID > -1 && classID < 5)
             {
                 PLServer.Instance.LatestSaveGameData.ClassData[classID].Talents = player.Talents;
                 PLServer.Instance.LatestSaveGameData.ClassData[classID].TalentPointsAvailable = player.TalentPointsAvailable;

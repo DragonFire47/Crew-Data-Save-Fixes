@@ -7,6 +7,10 @@ namespace CrewDataSaveFixes
     {
         static void Prefix(PLPlayer __instance, int inTalentID)
         {
+            if (PLServer.Instance.LatestSaveGameData == null)
+            {
+                return;
+            }
             if (inTalentID >= 0 && inTalentID < __instance.Talents.Length && PLServer.Instance.GetCachedFriendlyPlayerOfClass(__instance.GetClassID()) == __instance)
             {
                 TalentInfo talentInfoForTalentType = PLGlobal.GetTalentInfoForTalentType((ETalents)inTalentID);
