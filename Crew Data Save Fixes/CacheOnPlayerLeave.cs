@@ -8,7 +8,7 @@ namespace CrewDataSaveFixes
     {
         static void CachePlayerData(PLPlayer inPlayer) //Talents, Items
         {
-            if (inPlayer.TeamID != 0 || PLServer.Instance.LatestSaveGameData == null)//stop if not player team
+            if (inPlayer.TeamID != 0 || !(PLServer.Instance.LatestSaveGameData != null && PLServer.Instance.LatestSaveGameData.ClassData[inPlayer.GetClassID()] != null))//stop if not player team
             {
                 return;
             }

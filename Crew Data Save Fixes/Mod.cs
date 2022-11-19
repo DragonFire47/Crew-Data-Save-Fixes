@@ -4,7 +4,7 @@ namespace CrewDataSaveFixes
 {
     public class Mod : PulsarMod
     {
-        public override string Version => "1.0.3";
+        public override string Version => "1.0.4";
 
         public override string Author => "Dragon";
 
