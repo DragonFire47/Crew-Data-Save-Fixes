@@ -1,7 +1,10 @@
 ﻿using HarmonyLib;
+using PulsarModLoader.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Reflection.Emit;
 using static PulsarModLoader.Patches.HarmonyHelpers;
 
@@ -12,8 +15,8 @@ namespace CrewDataSaveFixes
     {
         //Write Cached Player Data instead of writing nothing.
         static void PatchMethod(BinaryWriter binaryWriter, int currentClass)
-		{
-            if(PLServer.Instance.LatestSaveGameData == null)
+        {
+            if (PLServer.Instance.LatestSaveGameData == null)
             {
                 binaryWriter.Write(false);
                 return;
@@ -25,7 +28,7 @@ namespace CrewDataSaveFixes
 
             int talentcount = PLServer.Instance.LatestSaveGameData.ClassData[currentClass].Talents.Length;
             binaryWriter.Write(talentcount);
-            for(int i = 0; i < talentcount; i++)
+            for (int i = 0; i < talentcount; i++)
             {
                 binaryWriter.Write(PLServer.Instance.LatestSaveGameData.ClassData[currentClass].Talents[i]);
             }
@@ -40,11 +43,33 @@ namespace CrewDataSaveFixes
                 binaryWriter.Write(item.Level);
                 binaryWriter.Write(item.OptionalEquipID);
             }
-		}
+        }
 
         static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
-            List<CodeInstruction> targetSequence = new List<CodeInstruction>
+            List<CodeInstruction> patchSequence = new List<CodeInstruction>
+            {
+                new CodeInstruction(OpCodes.Ldloc_S, (byte)31),
+                new CodeInstruction(OpCodes.Callvirt, AccessTools.Method(typeof(SavesPatch), "PatchMethod")),
+            };
+            var Instructions = instructions.ToList();
+            for (int i = 0; i < Instructions.Count; i++)
+            {
+                if (Instructions[i].opcode == OpCodes.Ldc_I4_0)
+                {
+                    if (Instructions[i + 1].opcode == OpCodes.Callvirt && (MethodInfo)Instructions[i + 1].operand == AccessTools.Method(typeof(BinaryWriter), "Write", new Type[] { typeof(bool) }))
+                    {
+                        if (Instructions[i+2].opcode == OpCodes.Ldloc_S && Instructions[i + 3].opcode == OpCodes.Ldc_I4_1 && Instructions[i + 4].opcode == OpCodes.Add)
+                        {
+                            Instructions.RemoveRange(i, 2);
+                            Instructions.InsertRange(i, patchSequence.Select(c => c.FullClone()));
+                            break;
+                        }
+                    }
+                }
+            }
+            return Instructions.AsEnumerable();
+            /*List<CodeInstruction> targetSequence = new List<CodeInstruction>
             {
                 new CodeInstruction(OpCodes.Ldc_I4_0),
                 new CodeInstruction(OpCodes.Callvirt, AccessTools.Method(typeof(BinaryWriter), "Write", new Type[] { typeof(bool) })),
@@ -55,7 +80,7 @@ namespace CrewDataSaveFixes
                 new CodeInstruction(OpCodes.Ldloc_S, (byte)31),
                 new CodeInstruction(OpCodes.Callvirt, AccessTools.Method(typeof(SavesPatch), "PatchMethod")),
             };
-            return PatchBySequence(instructions, targetSequence, patchSequence, PatchMode.REPLACE);
+            return PatchBySequence(instructions, targetSequence, patchSequence, PatchMode.REPLACE, default, true);*/
         }
     }
 }
