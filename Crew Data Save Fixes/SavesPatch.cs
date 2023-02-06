@@ -21,27 +21,40 @@ namespace CrewDataSaveFixes
                 binaryWriter.Write(false);
                 return;
             }
-
-            binaryWriter.Write(true);
-            binaryWriter.Write(PLServer.Instance.LatestSaveGameData.ClassData[currentClass].TalentPointsAvailable);
-            binaryWriter.Write(PLServer.Instance.ClassInfos[currentClass].SurvivalBonusCounter);
-
-            int talentcount = PLServer.Instance.LatestSaveGameData.ClassData[currentClass].Talents.Length;
-            binaryWriter.Write(talentcount);
-            for (int i = 0; i < talentcount; i++)
+            if (PLServer.Instance.LatestSaveGameData.ClassData[currentClass] == null || PLServer.Instance.ClassInfos[currentClass] == null)
             {
-                binaryWriter.Write(PLServer.Instance.LatestSaveGameData.ClassData[currentClass].Talents[i]);
+                Logger.Info("LatestSaveGameData.ClassData or PLServer.ClassInfos is null.");
+                binaryWriter.Write(false);
+                return;
             }
-
-            int itemcount = PLServer.Instance.LatestSaveGameData.ClassData[currentClass].PawnInventory.Count;
-            binaryWriter.Write(itemcount);
-            for (int i = 0; i < itemcount; i++)
+            try
             {
-                PawnItemDataBlock item = PLServer.Instance.LatestSaveGameData.ClassData[currentClass].PawnInventory[i];
-                binaryWriter.Write((int)item.ItemType);
-                binaryWriter.Write(item.SubType);
-                binaryWriter.Write(item.Level);
-                binaryWriter.Write(item.OptionalEquipID);
+                binaryWriter.Write(true);
+                binaryWriter.Write(PLServer.Instance.LatestSaveGameData.ClassData[currentClass].TalentPointsAvailable);
+                binaryWriter.Write(PLServer.Instance.ClassInfos[currentClass].SurvivalBonusCounter);
+
+                int talentcount = PLServer.Instance.LatestSaveGameData.ClassData[currentClass].Talents.Length;
+                binaryWriter.Write(talentcount);
+                for (int i = 0; i < talentcount; i++)
+                {
+                    binaryWriter.Write(PLServer.Instance.LatestSaveGameData.ClassData[currentClass].Talents[i]);
+                }
+
+                int itemcount = PLServer.Instance.LatestSaveGameData.ClassData[currentClass].PawnInventory.Count;
+                binaryWriter.Write(itemcount);
+                for (int i = 0; i < itemcount; i++)
+                {
+                    PawnItemDataBlock item = PLServer.Instance.LatestSaveGameData.ClassData[currentClass].PawnInventory[i];
+                    binaryWriter.Write((int)item.ItemType);
+                    binaryWriter.Write(item.SubType);
+                    binaryWriter.Write(item.Level);
+                    binaryWriter.Write(item.OptionalEquipID);
+                }
+            }
+            catch(Exception ex)
+            {
+                Logger.Info("Failed to save data at SavesPatch.\n" + ex.Message);
+                Messaging.Notification("<color=red>Crew Data Save Fixes has encountered an error. Please unload and save.</color>");
             }
         }
 
@@ -69,18 +82,6 @@ namespace CrewDataSaveFixes
                 }
             }
             return Instructions.AsEnumerable();
-            /*List<CodeInstruction> targetSequence = new List<CodeInstruction>
-            {
-                new CodeInstruction(OpCodes.Ldc_I4_0),
-                new CodeInstruction(OpCodes.Callvirt, AccessTools.Method(typeof(BinaryWriter), "Write", new Type[] { typeof(bool) })),
-            };
-
-            List<CodeInstruction> patchSequence = new List<CodeInstruction>
-            {
-                new CodeInstruction(OpCodes.Ldloc_S, (byte)31),
-                new CodeInstruction(OpCodes.Callvirt, AccessTools.Method(typeof(SavesPatch), "PatchMethod")),
-            };
-            return PatchBySequence(instructions, targetSequence, patchSequence, PatchMode.REPLACE, default, true);*/
         }
     }
 }

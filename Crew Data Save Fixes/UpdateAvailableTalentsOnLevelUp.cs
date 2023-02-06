@@ -1,4 +1,6 @@
 ﻿using HarmonyLib;
+using PulsarModLoader.Utilities;
+using System;
 
 namespace CrewDataSaveFixes
 {
@@ -7,16 +9,23 @@ namespace CrewDataSaveFixes
     {
         static void Postfix(PLServer __instance)
         {
-            if(__instance.LatestSaveGameData == null)
+            if (__instance.LatestSaveGameData == null)
             {
                 return;
             }
-            foreach (ClassDataBlock CDB in __instance.LatestSaveGameData.ClassData)
+            try
             {
-                if (CDB != null)
+                foreach (ClassDataBlock CDB in __instance.LatestSaveGameData.ClassData)
                 {
-                    CDB.TalentPointsAvailable += 2;
+                    if (CDB != null)
+                    {
+                        CDB.TalentPointsAvailable += 2;
+                    }
                 }
+            }
+            catch(Exception ex)
+            {
+                Logger.Info("Failed to add points to classDataBlocks.\n" + ex.Message);
             }
         }
     }
