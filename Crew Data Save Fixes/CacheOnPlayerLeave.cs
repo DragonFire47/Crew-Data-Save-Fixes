@@ -6,14 +6,19 @@ namespace CrewDataSaveFixes
     [HarmonyPatch(typeof(PLServer), "RemovePlayer")]
     internal class CacheOnPlayerLeave
     {
+        //Saves all player talents and items from cachedFriendly on player leave.
         static void CachePlayerData(PLPlayer inPlayer) //Talents, Items
         {
-            if (inPlayer.TeamID != 0 || !(PLServer.Instance.LatestSaveGameData != null && PLServer.Instance.LatestSaveGameData.ClassData[inPlayer.GetClassID()] != null))//stop if not player team
+            //stop if not player team
+            if (inPlayer.TeamID != 0)
             {
                 return;
             }
 
+            //Cache ClassID for everything that uses it
             int classID = inPlayer.GetClassID();
+
+            //Get CachedFriendlyPlayerOfClass and cache their talents + inventory.
             PLPlayer player = PLServer.Instance.GetCachedFriendlyPlayerOfClass(classID);
             if (player != null && classID > -1 && classID < 5)
             {
@@ -35,6 +40,8 @@ namespace CrewDataSaveFixes
                 PLServer.Instance.LatestSaveGameData.ClassData[classID].PawnInventory = pawnItemData;
             }
         }
+
+        //Link Patch method to Server.RemovePlayer
         static void Prefix(PLPlayer inPlayer)
         {
             CachePlayerData(inPlayer);

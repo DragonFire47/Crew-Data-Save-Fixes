@@ -1,31 +1,16 @@
 ﻿using HarmonyLib;
-using PulsarModLoader.Utilities;
-using System;
 
 namespace CrewDataSaveFixes
 {
     [HarmonyPatch(typeof(PLServer), "OnCrewLevelUp")]
     internal class UpdateAvailableTalentsOnLevelUp
     {
+        //Increases all CDB TalentPointsAvailable on crew level up.
         static void Postfix(PLServer __instance)
         {
-            if (__instance.LatestSaveGameData == null)
+            foreach (ClassDataBlock CDB in __instance.LatestSaveGameData.ClassData)
             {
-                return;
-            }
-            try
-            {
-                foreach (ClassDataBlock CDB in __instance.LatestSaveGameData.ClassData)
-                {
-                    if (CDB != null)
-                    {
-                        CDB.TalentPointsAvailable += 2;
-                    }
-                }
-            }
-            catch(Exception ex)
-            {
-                Logger.Info("Failed to add points to classDataBlocks.\n" + ex.Message);
+                CDB.TalentPointsAvailable += 2;
             }
         }
     }

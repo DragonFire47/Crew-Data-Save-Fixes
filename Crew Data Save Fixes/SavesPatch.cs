@@ -18,6 +18,7 @@ namespace CrewDataSaveFixes
         {
             if (PLServer.Instance.LatestSaveGameData == null)
             {
+                Logger.Info("LatestSaveGameData was null");
                 binaryWriter.Write(false);
                 return;
             }
@@ -58,6 +59,8 @@ namespace CrewDataSaveFixes
             }
         }
 
+
+        //Crew data saving - Replace Write(false) for no player data written with the current classID and the patch method.
         static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
             List<CodeInstruction> patchSequence = new List<CodeInstruction>

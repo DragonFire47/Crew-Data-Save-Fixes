@@ -62,7 +62,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CacheOnPlayerLeave.cs" />
+    <Compile Include="GlobalEnterNewGamePatch.cs" />
+    <Compile Include="Global.cs" />
     <Compile Include="Mod.cs" />
+    <Compile Include="PlayerDefaultInventoryItemsPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SavesPatch.cs" />
     <Compile Include="SurvivalBonusCounterCacheUpdatePatch.cs" />
