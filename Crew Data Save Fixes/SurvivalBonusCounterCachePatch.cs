@@ -3,7 +3,7 @@
 namespace CrewDataSaveFixes
 {
     [HarmonyPatch(typeof(PLServer), "GetCDBForPlayer")]
-    class SurvivalBonusCounterCacheUpdatePatch
+    class SurvivalBonusCounterCachePatch
     {
         static void Postfix(PLPlayer inPlayer, ref ClassDataBlock __result)
         {

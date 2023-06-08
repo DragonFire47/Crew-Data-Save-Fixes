@@ -68,7 +68,7 @@
     <Compile Include="PlayerDefaultInventoryItemsPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SavesPatch.cs" />
-    <Compile Include="SurvivalBonusCounterCacheUpdatePatch.cs" />
+    <Compile Include="SurvivalBonusCounterCachePatch.cs" />
     <Compile Include="UpdateAvailableTalentsOnLevelUp.cs" />
     <Compile Include="UpdateAvailableTalentsOnSpend.cs" />
   </ItemGroup>
